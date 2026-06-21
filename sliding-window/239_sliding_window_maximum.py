@@ -7,8 +7,11 @@ You are given an array of integers nums, there is a sliding window of size k whi
 Return the max sliding window.
 """
 import heapq
+from collections import deque
 
 class Solution:
+    """
+    # O(nlogn) solution using heaps
     def maxSlidingWindow(self, nums: list[int], k: int) -> list[int]:
         # solved using a max heap storing the tuple (value, index)
         max_heap = []
@@ -47,3 +50,36 @@ class Solution:
             right += 1
 
         return res
+    """
+    # O(n) solution using a deque
+    def maxSlidingWindow(self, nums: list[int], k: int) -> list[int]:
+        # Using a deque to store index of the values that have been covered so far.
+        # The deque will be strictly decreasing. If we find a larger values remove them
+        # and add the value
+        deq = deque()
+        res = []
+
+        left = 0
+        right = 0
+        while right < len(nums):
+            # remove indexes from the deque outside of window
+            while len(deq) != 0 and deq[0] < left:
+                deq.popleft()
+
+            # add new element at right after removing previous elements that are smaller
+            while len(deq) != 0 and nums[deq[-1]] < nums[right]:
+                deq.pop()
+            deq.append(right)
+
+            # window size is at k
+            if (right - left + 1) == k:
+                # the max is at the front of the deque
+                res.append(nums[deq[0]])
+                # move the left side right
+                left += 1
+
+            # move the window right
+            right += 1
+
+        return res
+
